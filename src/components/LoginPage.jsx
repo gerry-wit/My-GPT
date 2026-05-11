@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { auth } from '../services/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { LogIn, UserPlus, ShieldCheck } from 'lucide-react';
+import { LogIn, UserPlus, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import './Login.css';
 
 const LoginPage = ({ onLogin }) => {
@@ -9,6 +9,7 @@ const LoginPage = ({ onLogin }) => {
   const [password, setPassword] = useState('magicmario');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState('login');
 
   const handleAuth = async (e, type) => {
     e.preventDefault();
@@ -29,62 +30,88 @@ const LoginPage = ({ onLogin }) => {
     }
   };
 
+  const isLogin = mode === 'login';
+
   return (
     <div className="login-container fade-in">
-      <div className="login-card glass">
-        <div className="login-header">
-          <div className="logo-icon large">GPT</div>
-          <h1>Welcome to My-GPT</h1>
-          <p>Secure access to your personal AI workspace</p>
+      <div className="login-card">
+        <div className="login-brand">
+          <div className="login-logo">
+            <Sparkles size={22} />
+          </div>
+          <h1>My-GPT</h1>
+          <p>Your personal AI workspace</p>
         </div>
 
-        <form className="login-form">
+        <form className="login-form" onSubmit={(e) => handleAuth(e, mode)}>
           <div className="input-group">
-            <label>Email Address</label>
-            <input 
-              type="email" 
-              value={email} 
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@company.com"
+              placeholder="you@example.com"
+              required
             />
           </div>
+
           <div className="input-group">
             <label>Password</label>
-            <input 
-              type="password" 
-              value={password} 
+            <input
+              type="password"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
+              required
             />
           </div>
 
           {error && <div className="auth-error">{error}</div>}
 
-          <div className="auth-actions">
-            <button 
-              className="btn-login" 
-              onClick={(e) => handleAuth(e, 'login')}
-              disabled={loading}
-            >
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 size={18} className="spinner" />
+            ) : isLogin ? (
               <LogIn size={18} />
-              <span>{loading ? 'Authenticating...' : 'Sign In'}</span>
-            </button>
-            <button 
-              className="btn-register" 
-              onClick={(e) => handleAuth(e, 'register')}
-              disabled={loading}
-            >
+            ) : (
               <UserPlus size={18} />
-              <span>Register</span>
-            </button>
-          </div>
+            )}
+            <span>
+              {loading
+                ? 'Please wait...'
+                : isLogin
+                  ? 'Sign In'
+                  : 'Create Account'}
+            </span>
+            {!loading && <ArrowRight size={16} />}
+          </button>
         </form>
 
-        <div className="login-footer">
-          <ShieldCheck size={14} />
-          <span>Protected by Firebase Auth</span>
+        <div className="login-divider">
+          <span />
+          <p>or</p>
+          <span />
         </div>
+
+        <button
+          type="button"
+          className="btn-ghost"
+          onClick={() => {
+            setMode(isLogin ? 'register' : 'login');
+            setError('');
+          }}
+        >
+          {isLogin ? 'Create an account' : 'Already have an account? Sign in'}
+        </button>
       </div>
+
+      <p className="login-footer">
+        Secure sign-in powered by Firebase Auth
+      </p>
     </div>
   );
 };

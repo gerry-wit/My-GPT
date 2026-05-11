@@ -7,17 +7,21 @@ const FileItem = ({ item, depth = 0 }) => {
 
   return (
     <div className="file-item-container">
-      <div 
-        className="file-item" 
-        style={{ paddingLeft: `${depth * 12 + 12}px` }}
+      <div
+        className="file-item"
+        style={{ paddingLeft: `${depth * 14 + 10}px` }}
         onClick={() => hasChildren && setIsOpen(!isOpen)}
       >
         {hasChildren ? (
-          isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />
+          isOpen ? (
+            <ChevronDown size={13} />
+          ) : (
+            <ChevronRight size={13} />
+          )
         ) : (
-          <FileText size={14} className="file-icon" />
+          <FileText size={13} className="file-icon" />
         )}
-        {hasChildren && <Folder size={14} className="folder-icon" />}
+        {hasChildren && <Folder size={13} className="folder-icon" />}
         <span>{item.name}</span>
       </div>
       {hasChildren && isOpen && (
@@ -36,20 +40,43 @@ const FileTree = () => {
     {
       name: 'src',
       children: [
-        { name: 'assets', children: [{ name: 'react.svg' }, { name: 'vite.svg' }] },
-        { name: 'components', children: [{ name: 'FileTree.jsx' }] },
-        { name: 'services', children: [{ name: 'openrouter.js' }] },
+        {
+          name: 'assets',
+          children: [{ name: 'react.svg' }, { name: 'vite.svg' }],
+        },
+        {
+          name: 'components',
+          children: [
+            { name: 'FileTree.jsx' },
+            { name: 'LoadingScreen.jsx' },
+            { name: 'LoginPage.jsx' },
+            { name: 'SettingsModal.jsx' },
+            { name: 'ImageGenModal.jsx' },
+          ],
+        },
+        {
+          name: 'services',
+          children: [
+            { name: 'openrouter.js' },
+            { name: 'firebase.js' },
+            { name: 'firestore.js' },
+          ],
+        },
+        { name: 'utils', children: [{ name: 'export.js' }] },
         { name: 'App.css' },
         { name: 'App.jsx' },
         { name: 'index.css' },
-        { name: 'main.jsx' }
-      ]
+        { name: 'main.jsx' },
+      ],
     },
-    { name: 'public', children: [{ name: 'favicon.svg' }, { name: 'icons.svg' }] },
+    {
+      name: 'public',
+      children: [{ name: 'favicon.svg' }, { name: 'icons.svg' }],
+    },
+    { name: 'api', children: [{ name: 'chat.js' }, { name: 'image.js' }] },
     { name: 'index.html' },
     { name: 'package.json' },
     { name: 'vite.config.js' },
-    { name: '.env' }
   ];
 
   return (
