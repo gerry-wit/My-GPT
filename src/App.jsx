@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   MessageSquare, 
   Settings, 
@@ -12,7 +12,10 @@ import {
   Send
 } from 'lucide-react';
 import { chatCompletion, parseStream } from './services/openrouter';
+import { auth } from './services/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import FileTree from './components/FileTree';
+import LoginPage from './components/LoginPage';
 import './App.css';
 
 const SidebarItem = ({ icon: Icon, label, active = false, onClick }) => (
@@ -26,6 +29,8 @@ const SidebarItem = ({ icon: Icon, label, active = false, onClick }) => (
 );
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('chat');
   const [selectedModel, setSelectedModel] = useState('anthropic/claude-3.5-sonnet');
   const [messages, setMessages] = useState([
@@ -34,6 +39,24 @@ function App() {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [totalSpent, setTotalSpent] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = () => signOut(auth);
+
+  if (authLoading) {
+    return <div className="loading-screen">Loading...</div>;
+  }
+
+  if (!user) {
+    return <LoginPage onLogin={() => {}} />;
+  }
 
   const handleSend = async () => {
     if (!input.trim() || isTyping) return;
@@ -139,10 +162,18 @@ function App() {
 
         <div className="sidebar-footer">
           <div className="user-profile">
-            <User size={18} />
-            <span>Gerry Wit</span>
+            <div className="user-avatar">{user.email[0].toUpperCase()}</div>
+            <div className="user-info">
+              <span>{user.email.split('@')[0]}</span>
+              <p>{user.email}</p>
+            </div>
           </div>
-          <Settings size={18} className="settings-icon" />
+          <Settings 
+            size={18} 
+            className="settings-icon" 
+            onClick={handleLogout}
+            title="Logout"
+          />
         </div>
       </aside>
 
